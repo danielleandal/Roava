@@ -1,0 +1,129 @@
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;;
+}
+
+#root {
+  display: grid;
+  place-items: center;                 /* centers horizontally + vertically */
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e5e7eb;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Background */
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #1e293b);
+  color: #e5e7eb;
+  min-height: 100vh;
+    height: 100%;
+  width: 100%;;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+/* Container */
+.container {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+/* Title + subtitle */
+h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;   /* tighten below title */
+  margin-top: 50px;
+}
+
+p {
+  color: #94a3b8;
+  margin-bottom: 1.75rem;   /* give tagline more space above card */
+}
+
+/* Card */
+.card {
+  background: rgba(31, 41, 55, 0.85);
+  border: 1px solid #334155;
+  border-radius: 16px;
+  padding: 2rem;            /* more breathing room inside */
+  width: 100%;
+  text-align: left;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  margin-bottom: 2rem;      /* push card away from footer */
+}
+
+/* Footer */
+footer {
+  margin-top: 2rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+/* Form elements */
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #475569;
+  background: #0f172a;
+  color: white;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+input::placeholder {
+  color: #64748b;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+/* Button */
+button {
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 10px;
+  background: #10b981;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #06281f;
+  transition: background 0.2s ease, transform 0.05s ease;
+}
+
+button:hover {
+  background: #059669;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+/* Footer */
+footer {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+}
