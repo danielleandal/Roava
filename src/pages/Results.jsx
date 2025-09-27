@@ -1,6 +1,6 @@
-// Results.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocation, Link } from "react-router-dom";
+import "./Results.css";
 
 export default function Results() {
   const { search } = useLocation();
@@ -16,6 +16,11 @@ export default function Results() {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // pagination state
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(20);
+
+  // fetch plan
   useEffect(() => {
     (async () => {
       try {
@@ -29,6 +34,7 @@ export default function Results() {
         const j = await r.json();
         if (!r.ok) throw new Error(j.error || "Failed to fetch");
         setData(j);
+        setPage(1); // reset on new data
       } catch (e) {
         setErr(e.message || "Something went wrong");
       } finally {
@@ -37,35 +43,76 @@ export default function Results() {
     })();
   }, [city, start, end, pace, qs.get("interests")]);
 
-  if (loading) return <div className="container"><h1>Building…</h1></div>;
-  if (err) return <div className="container"><h1>Oops</h1><p>{err}</p></div>;
+  // 🔸 ALWAYS-CALLED HOOKS
+  const total = data?.pois?.length ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / perPage));
+
+  const currentSlice = useMemo(() => {
+    const arr = data?.pois ?? [];
+    const startIdx = (page - 1) * perPage;
+    return arr.slice(startIdx, startIdx + perPage);
+  }, [data, page, perPage]);
+
+  useEffect(() => {
+    if (page > totalPages) setPage(totalPages);
+  }, [perPage, totalPages, page]);
+
+  if (loading) return <div className="results container"><h1>Building…</h1></div>;
+  if (err) return <div className="results container"><h1>Oops</h1><p>{err}</p></div>;
   if (!data) return null;
 
+  const Pager = () => (
+    <div className="results-pager card">
+      <div className="results-pager-controls">
+        <button onClick={() => setPage(1)} disabled={page===1}>⏮First</button>
+        <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page===1}>◀Prev</button>
+        <span>Page <strong>{page}</strong> / {totalPages}</span>
+        <button onClick={() => setPage(p => Math.min(totalPages, p+1))} disabled={page===totalPages}>Next▶</button>
+        <button onClick={() => setPage(totalPages)} disabled={page===totalPages}>Last⏭</button>
+      </div>
+      <div className="results-pager-size">
+        <label>Per page</label>
+        <select value={perPage} onChange={e => setPerPage(Number(e.target.value))}>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={30}>30</option>
+          <option value={50}>50</option>
+        </select>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="container">
+    <div className="results container">
       <h1>Your Itinerary (raw POIs)</h1>
       <p><strong>{data.city}</strong> • {start} → {end} • {pace}</p>
 
-      <div className="card">
-        <p><strong>Center:</strong> {data.center.lat.toFixed(4)}, {data.center.lon.toFixed(4)}</p>
-        <p style={{marginTop:8}}><strong>POIs:</strong> {data.count}</p>
+      <div className="results-summary card">
+        <p><strong>Center:</strong> {data.center ? `${data.center.lat.toFixed(4)}, ${data.center.lon.toFixed(4)}` : "—"}</p>
+        <p><strong>POIs:</strong> {total}</p>
       </div>
 
-      {/* simple list of POIs */}
-      <div className="card">
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {data.pois.slice(0, 50).map((p, i) => (
-            <li key={p.xid || i} style={{ padding: "8px 0", borderBottom: "1px solid #334155" }}>
-              <div style={{ fontWeight: 600 }}>{p.name || "Unnamed place"}</div>
-              <div style={{ color: "#94a3b8", fontSize: ".95rem" }}>
-                {p.kinds} • {Math.round(p.dist)} m from center • rate {p.rate ?? "-"}
-              </div>
-            </li>
-          ))}
+      <Pager />
+
+      <div className="results-list card">
+        <ul>
+          {currentSlice.map((p, i) => {
+            const n = (page - 1) * perPage + i + 1;
+            return (
+              <li key={p.xid || `${p.name}-${i}`}>
+                <div className="results-item-title">{n}. {p.name || "Unnamed place"}</div>
+                <div className="results-item-meta">
+                  {p.kinds} • {Math.round(p.dist)} m from center • rate {p.rate ?? "-"}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
-      <Link to="/" style={{ color: "#10b981", fontWeight: 600 }}>← Back</Link>
+      <Pager />
+
+      <Link to="/" className="results-back">← Back</Link>
     </div>
   );
 }

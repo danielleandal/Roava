@@ -1,0 +1,149 @@
+/* Results.css */
+
+/* Container */
+.results.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 1rem;
+  color: #e5e7eb;
+  font-family: system-ui, sans-serif;
+}
+
+/* Headings */
+.results.container h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.results.container p {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
+}
+
+/* Card blocks */
+.results-summary.card,
+.results-list.card,
+.results-pager.card {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+/* Pagination Bar */
+.results-pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 0.5rem 1rem;
+  margin: 1rem 0;
+  gap: 1rem;
+}
+
+/* Controls group (left side) */
+.results-pager-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Buttons */
+.results-pager-controls button {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  background: #1e293b;     /* dark navy */
+  color: #e5e7eb;          /* light text */
+  transition: background 0.2s, color 0.2s;
+  text-align: center;
+}
+
+.results-pager-controls button:hover:not(:disabled) {
+  background: #2563eb;     /* blue hover */
+  color: #ffffff;
+}
+
+.results-pager-controls button:disabled {
+  background: #334155;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+/* Page indicator text */
+.results-pager-controls span {
+  color: #cbd5e1;
+  font-size: 0.95rem;
+  margin: 0 0.5rem;
+  white-space: nowrap; /* keep "Page 2 / 30" one line */
+}
+
+.results-pager-controls strong {
+  color: #10b981; /* current page number highlight */
+  font-weight: 700;
+}
+
+/* Per page dropdown (right side) */
+.results-pager-size {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.results-pager-size label {
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.results-pager-size select {
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #e5e7eb;
+  border: 1px solid #475569;
+  font-size: 0.85rem;
+}
+
+/* POI list */
+.results-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.results-list li {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #334155;
+}
+
+.results-item-title {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.results-item-meta {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin-top: 0.25rem;
+}
+
+/* Back link */
+.results-back {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #10b981;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.results-back:hover {
+  text-decoration: underline;
+}
