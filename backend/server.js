@@ -9,6 +9,10 @@ app.use(express.json());
 // ---- put your real key here (backend only) ----
 const OTM_KEY = "5ae2e3f221c38a28845f05b66888648c23a955442a5629972fd705cb";
 
+app.listen(3001, "0.0.0.0", () => {
+  console.log("✅ Backend running at http://0.0.0.0:3001");
+});
+
 // Root (optional)
 app.get("/", (_req, res) => res.send("Roava backend up"));
 
