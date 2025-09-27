@@ -200,6 +200,7 @@ body, .landing-root {
 
 /* More variation */
 .plane:nth-child(1) { top: 10%; left: -12%; transform: rotate(8deg); animation-duration: 26s; animation-delay: 0s; }
+.plane:nth-child(19) { top: 80%; left: -10%; transform: rotate(8deg); animation-duration: 26s; animation-delay: 0s; }
 .plane:nth-child(2) { top: 25%; left: -15%; transform: rotate(6deg); animation-duration: 30s; animation-delay: 3s; }
 .plane:nth-child(3) { top: 40%; left: -18%; transform: rotate(10deg); animation-duration: 32s; animation-delay: 6s; }
 .plane:nth-child(4) { top: 55%; left: -14%; transform: rotate(5deg); animation-duration: 28s; animation-delay: 9s; }

@@ -164,3 +164,80 @@ footer {
   padding-left: 0.25rem;
 }
 
+/* Ensure your main container sits above the background */
+.container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Full-viewport sky background */
+.sky {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0; /* behind the container */
+}
+
+/* Use your existing airplane image path; tint with filter */
+.plane {
+  position: absolute;
+  width: 85px;
+  height: 85px;
+  opacity: 0.35;
+  background: center/contain no-repeat url("../../airplane.png"); /* adjust path if needed */
+  animation: fly 28s linear infinite;
+  /* Recolor to blue/teal (tweak hue-rotate to match your palette) */
+  filter:
+    drop-shadow(0 2px 6px rgba(0,0,0,.4))
+    brightness(0) saturate(100%)
+    invert(43%) sepia(94%) saturate(747%)
+    hue-rotate(185deg) brightness(95%) contrast(90%);
+}
+
+/* Vary positions/speeds so they don’t move in sync */
+.plane:nth-child(1) { top: 12%; left: -12%; transform: rotate(8deg);  animation-duration: 26s; animation-delay: 0s; }
+.plane:nth-child(2) { top: 28%; left: -16%; transform: rotate(6deg);  animation-duration: 30s; animation-delay: 3s; }
+.plane:nth-child(3) { top: 44%; left: -20%; transform: rotate(10deg); animation-duration: 32s; animation-delay: 6s; }
+.plane:nth-child(4) { top: 60%; left: -14%; transform: rotate(5deg);  animation-duration: 28s; animation-delay: 9s; }
+.plane:nth-child(5) { top: 76%; left: -22%; transform: rotate(12deg); animation-duration: 34s; animation-delay: 12s; }
+.plane:nth-child(6) { top: 20%; left: -25%; transform: rotate(7deg);  animation-duration: 36s; animation-delay: 15s; }
+.plane:nth-child(7) { top: 50%; left: -26%; transform: rotate(9deg);  animation-duration: 38s; animation-delay: 18s; }
+.plane:nth-child(8) { top: 70%; left: -28%; transform: rotate(11deg); animation-duration: 40s; animation-delay: 21s; }
+.plane:nth-child(9) { top: 35%; left: -18%; transform: rotate(4deg);  animation-duration: 33s; animation-delay: 24s; }
+.plane:nth-child(10){ top: 85%; left: -20%; transform: rotate(13deg); animation-duration: 42s; animation-delay: 27s; }
+
+/* Flight path */
+@keyframes fly {
+  from { transform: translate3d(0,0,0) rotate(8deg); }
+  to   { transform: translate3d(120vw, -20vh, 0) rotate(8deg); }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .plane { animation-duration: 90s; opacity: 0.15; }
+}
+
+/* Stars */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 2s infinite ease-in-out;
+}
+
+/* Place stars randomly */
+.star:nth-child(4n) { top: 10%; left: 20%; animation-delay: 0.3s; }
+.star:nth-child(5n) { top: 30%; left: 70%; animation-delay: 1s; }
+.star:nth-child(6n) { top: 60%; left: 40%; animation-delay: 1.5s; }
+.star:nth-child(7n) { top: 80%; left: 90%; animation-delay: 2s; }
+.star:nth-child(8n) { top: 50%; left: 15%; animation-delay: 2.5s; }
+/* You can keep adding more nth-child rules for variety */
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%      { opacity: 1; transform: scale(1.2); }
+}

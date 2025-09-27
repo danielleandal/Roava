@@ -49,6 +49,23 @@ export default function Landing() {
         <span className="plane" />
         <span className="plane" />
 
+              {Array.from({ length: 50 }).map((_, i) => {
+        const size = Math.random() * 4 + 2; // stars between 2px and 6px
+        return (
+          <span
+            key={i}
+            className="star"
+            style={{
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              width: `${size}px`,
+              height: `${size}px`,
+              animationDelay: `${Math.random() * 3}s`
+            }}
+          />
+        );
+      })}
+
       </div>
 
       {/* NAV */}
