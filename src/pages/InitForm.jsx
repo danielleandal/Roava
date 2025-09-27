@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./InitForm.css"; // make sure this file exists (or remove this line)
+import axios from "axios";
+import "./InitForm.css"; 
 
 const INTEREST_OPTIONS = ["museums", "food", "views", "nature", "shopping", "history", "nightlife"];
 
@@ -14,6 +15,10 @@ export default function InitForm() {
   const [interests, setInterests] = useState(["museums", "food", "views"]);
   const [showInterests, setShowInterests] = useState(false);
   const [error, setError] = useState("");
+
+  //New
+  const [suggestions, setSuggestions] = useState([]);
+
 
   function toggleInterest(option) {
     setInterests(prev =>
@@ -39,6 +44,60 @@ export default function InitForm() {
     navigate(`/results?${qs}`);
   }
 
+
+
+
+  // New Stuff Starts Here
+    // Debounce: wait 500ms after typing before fetching
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (city.length > 1) {
+        fetchCities(city);
+      } else {
+        setSuggestions([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [city]);
+
+  async function fetchCities(query) {
+    try {
+      const response = await axios.get(
+        "https://wft-geo-db.p.rapidapi.com/v1/geo/cities",
+        {
+          params: { namePrefix: query, limit: 5 }, // limit results
+          headers: {
+            "X-RapidAPI-Key": "60658e8902mshd0a9b932fe0c38bp1d8674jsn604ed8123a7e", // replace with your key
+            "X-RapidAPI-Host": "wft-geo-db.p.rapidapi.com",
+          },
+        }
+      );
+
+        const seen = new Set();
+        const results = response.data.data
+        .map((c) => `${c.city}, ${c.country}`)
+        .filter((item) => {
+            if (seen.has(item)) return false;
+            seen.add(item);
+            return true;
+        });
+
+        setSuggestions(results);
+
+    } catch (error) {
+      console.error("Error fetching cities:", error);
+    } finally {
+      
+    }
+  }
+
+  function handleSelect(suggestion) {
+    setCity(suggestion);
+    setSuggestions([]); // hide dropdown
+  }
+
+
   return (
     <div className="container">
       <h1>Roava AI</h1>
@@ -46,10 +105,28 @@ export default function InitForm() {
 
       <div className="card">
         <form onSubmit={handleSubmit}>
-          <div>
+          <div style={{ position: "relative" }}>
             <label>Destination City</label>
-            <input type="text" value={city} onChange={(e)=>setCity(e.target.value)} placeholder="e.g., Tokyo" />
-          </div>
+            <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="e.g., Tokyo"
+                autoComplete="off"
+            />
+
+
+            {suggestions.length > 0 && (
+                <ul className="suggestions">
+                {suggestions.map((s, i) => (
+                    <li key={i} onClick={() => handleSelect(s)}>
+                    {s}
+                    </li>
+                ))}
+                </ul>
+            )}
+            </div>
+
 
           <div>
             <label>Start Date</label>
