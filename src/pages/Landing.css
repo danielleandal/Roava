@@ -1,0 +1,169 @@
+/* Base Theme */
+
+html {
+  scroll-behavior: smooth;
+}
+:root {
+  scroll-padding-top: 80px; /* Adjust based on your nav height */
+}
+
+body, .landing-root {
+  background-color: #0E1629;
+  color: #FFFFFF;
+  font-family: 'Inter', sans-serif;
+  width: 100%;
+}
+
+/* Logo */
+.landing-logo {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #FFFFFF;
+}
+
+.landing-logo span {
+  color: #16C784;
+}
+
+/* Nav */
+.landing-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  background-color: transparent;
+}
+
+.landing-links a {
+  color: #A0AEC0;
+  margin-left: 1.5rem;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.landing-links a:hover {
+  color: #FFFFFF;
+}
+
+.btn {
+  background-color: #16C784;
+  color: #0E1629;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #13a56e;
+}
+
+.btn--ghost {
+  background-color: #2D3748;
+  color: #FFFFFF;
+  border: 1px solid #2D3B55;
+}
+
+.btn--ghost:hover {
+  background-color: #3C4A63;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero p {
+  color: #A0AEC0;
+  max-width: 600px;
+  margin: 0 auto 2rem;
+}
+
+.cta-row {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.hero-badges span {
+  display: inline-block;
+  margin: 0.5rem;
+  background-color: #1C2A42;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #A0AEC0;
+}
+
+/* Card Grid Sections */
+.card-grid-landing {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 4rem 2rem;
+}
+
+.card-landing {
+  background-color: #1C2A42;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 300px;
+  flex: 1;
+  color: #FFFFFF;
+}
+
+.card-landing h3 {
+  margin-bottom: 0.5rem;
+}
+
+.card-landing p {
+  color: #A0AEC0;
+}
+
+/* How it Works / Safety */
+.steps, .safety {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #1C2A42;
+  padding: 2.5rem;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+}
+
+.steps ol, .safety ul {
+  color: #A0AEC0;
+  padding-left: 1.25rem;
+}
+
+.steps li strong, .safety li strong {
+  color: #FFFFFF;
+}
+
+.final-cta {
+  background-color: #1C2A42; /* Matches card background for consistency */
+  color: #FFFFFF;            /* Ensure heading text is visible */
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.final-cta h2 {
+  color: #FFFFFF;         
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Footer */
+.landing-footer {
+  text-align: center;
+  padding: 2rem;
+  color: #A0AEC0;
+  font-size: 0.875rem;
+}
