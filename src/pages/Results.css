@@ -112,27 +112,37 @@
   font-size: 0.85rem;
 }
 
+.results-list { overflow: hidden; }
+
 /* POI list */
 .results-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-
 .results-list li {
   padding: 0.75rem 0;
   border-bottom: 1px solid #334155;
+  overflow-wrap: anywhere;   /* modern, breaks anywhere if needed */
+  word-break: break-word;    /* fallback */
+  hyphens: auto;             /* allow hyphenation when possible */
 }
 
 .results-item-title {
   font-weight: 600;
   font-size: 1rem;
+  margin-bottom: .25rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .results-item-meta {
   color: #94a3b8;
   font-size: 0.9rem;
-  margin-top: 0.25rem;
+  line-height: 1.4;
+  white-space: normal;       /* ensure wrapping */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Back link */

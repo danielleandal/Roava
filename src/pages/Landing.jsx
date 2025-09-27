@@ -4,6 +4,53 @@ import "./Landing.css";
 export default function Landing() {
   return (
     <div className="landing-root">
+
+
+    {/* moving planes background */}
+      <div className="sky" aria-hidden="true">
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+        <span className="plane" />
+
+      </div>
+
       {/* NAV */}
       <header className="landing-nav">
         <div className="landing-logo">Roava<span>AI</span></div>

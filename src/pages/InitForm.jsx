@@ -26,24 +26,27 @@ export default function InitForm() {
     );
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!city.trim()) return setError("Please enter a destination city.");
-    if (!start || !end) return setError("Please pick your start and end dates.");
-    if (new Date(end) <= new Date(start)) return setError("End date must be after start date.");
+function handleSubmit(e) {
+  e.preventDefault();
+  if (!city.trim()) return setError("Please enter a destination city.");
+  if (!start || !end) return setError("Please pick your start and end dates.");
+  if (new Date(end) <= new Date(start)) return setError("End date must be after start date.");
 
-    setError("");
-    const qs = new URLSearchParams({
-      city: city.trim(),
-      start,
-      end,
-      pace,
-      interests: interests.join(","),
-    }).toString();
+  setError("");
 
-    navigate(`/results?${qs}`);
-  }
+  // normalize: strip country if present
+  const normalizedCity = city.split(",")[0].trim();
 
+  const qs = new URLSearchParams({
+    city: normalizedCity,
+    start,
+    end,
+    pace,
+    interests: interests.join(","),
+  }).toString();
+
+  navigate(`/results?${qs}`);
+}
 
 
 
