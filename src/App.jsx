@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [city, setCity] = useState("");
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [pace, setPace] = useState("normal");
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    alert(`Building itinerary for ${city} (${start} → ${end}, pace: ${pace})`);
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div className="container">
+      <h1>Roava AI</h1>
+      <p>AI-powered itineraries for solo travelers ✈️</p>
 
-export default App
+      <div className="card">
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Destination City</label>
+            <input
+              type="text"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              placeholder="e.g., Tokyo"
+            />
+          </div>
+
+          <div>
+            <label>Start Date</label>
+            <input
+              type="date"
+              value={start}
+              onChange={(e) => setStart(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label>End Date</label>
+            <input
+              type="date"
+              value={end}
+              onChange={(e) => setEnd(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label>Trip Pace</label>
+            <select value={pace} onChange={(e) => setPace(e.target.value)}>
+              <option value="chill">😌 Chill</option>
+              <option value="normal">🙂 Normal</option>
+              <option value="packed">⚡ Packed</option>
+            </select>
+          </div>
+
+          <button type="submit">Build Itinerary</button>
+        </form>
+      </div>
+
+      <footer style={{ marginTop: "2rem", color: "#94a3b8", fontSize: "0.9rem" }}>
+        Built at Hackathon • 2025
+      </footer>
+    </div>
+  );
+}
