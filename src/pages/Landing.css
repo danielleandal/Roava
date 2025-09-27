@@ -1,4 +1,12 @@
 /* Base Theme */
+
+html {
+  scroll-behavior: smooth;
+}
+:root {
+  scroll-padding-top: 80px; /* Adjust based on your nav height */
+}
+
 body, .landing-root {
   background-color: #0E1629;
   color: #FFFFFF;
