@@ -20,7 +20,7 @@ app.get("/api/ping", (_req, res) => {
 // Hardcoded test: geocode a fixed city
 app.get("/api/test", async (_req, res) => {
   try {
-    const city = "Tokyo, Japan"; // hardcoded
+    const city = "New York"; // hardcoded
     const geo = await fetch(
       `https://api.opentripmap.com/0.1/en/places/geoname?name=${encodeURIComponent(city)}&apikey=${OTM_KEY}`
     ).then(r => r.json());
