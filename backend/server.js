@@ -10,8 +10,9 @@ app.use(express.json());
 const OTM_KEY = "5ae2e3f221c38a28845f05b66888648c23a955442a5629972fd705cb";
 
 app.listen(3001, "0.0.0.0", () => {
-  console.log("✅ Backend running at http://0.0.0.0:3001");
+  console.log("✅ Backend running at http://45.55.91.156:3001/");
 });
+
 
 // Root (optional)
 app.get("/", (_req, res) => res.send("Roava backend up"));
@@ -76,5 +77,3 @@ app.post("/api/plan", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch itinerary", detail: e.message });
   }
 });
-
-app.listen(3001, () => console.log("✅ Backend running at http://localhost:3001"));

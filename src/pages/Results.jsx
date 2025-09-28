@@ -26,11 +26,11 @@ export default function Results() {
       try {
         setLoading(true);
         setErr("");
-        const r = await fetch("http://localhost:3001/api/plan", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ city, start, end, pace, interests })
-        });
+       const r = await fetch("/api/plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ city, interests }),
+      });
         const j = await r.json();
         if (!r.ok) throw new Error(j.error || "Failed to fetch");
         setData(j);
