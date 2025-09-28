@@ -84,7 +84,7 @@ export default function Landing() {
         <section className="hero">
           <h1>Solo travel, made simple.</h1>
           <p>
-            Drop a destination. We build a smart, safe itinerary in seconds—
+            Drop a destination. We build a smart, safe itinerary in seconds,
             tailored to your pace and interests.
           </p>
           <div className="cta-row">
@@ -111,7 +111,7 @@ export default function Landing() {
           </div>
           <div className="card-landing">
             <h3>Tailored to you</h3>
-            <p>Choose pace and interests—museums, food, views, nature, shopping, and more.</p>
+            <p>Choose pace and interests, museums, food, views, nature, shopping, and more.</p>
           </div>
           <div className="card-landing">
             <h3>Map-ready</h3>
