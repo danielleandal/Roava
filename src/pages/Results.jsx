@@ -16,25 +16,31 @@ export default function Results() {
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
 
+  // NEW: AI state
+  const [aiText, setAiText] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiErr, setAiErr] = useState("");
+
   // pagination state
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
 
-  // fetch plan
+  // fetch plan (from your public server)
   useEffect(() => {
     (async () => {
       try {
         setLoading(true);
         setErr("");
-       const r = await fetch("/api/plan", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ city, interests }),
-      });
+        const r = await fetch("http://45.55.91.156:3001/api/plan", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ city, start, end, pace, interests })
+        });
         const j = await r.json();
         if (!r.ok) throw new Error(j.error || "Failed to fetch");
         setData(j);
-        setPage(1); // reset on new data
+        setPage(1);
+        setAiText(""); // reset AI text when city/filters change
       } catch (e) {
         setErr(e.message || "Something went wrong");
       } finally {
@@ -43,7 +49,7 @@ export default function Results() {
     })();
   }, [city, start, end, pace, qs.get("interests")]);
 
-  // 🔸 ALWAYS-CALLED HOOKS
+  // pagination calcs
   const total = data?.pois?.length ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
@@ -57,6 +63,44 @@ export default function Results() {
     if (page > totalPages) setPage(totalPages);
   }, [perPage, totalPages, page]);
 
+  // NEW: call AI polish
+  async function runPolish() {
+    try {
+      setAiLoading(true);
+      setAiErr("");
+      setAiText("");
+
+      // keep payload light
+      const compactPOIs = (data?.pois || [])
+        .slice(0, 40)
+        .map(p => ({ name: p.name, kinds: p.kinds, rate: p.rate }));
+
+      const r = await fetch("http://45.55.91.156:3001/api/polish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          city,
+          start,
+          end,
+          pace,
+          pois: compactPOIs
+        })
+      });
+      const j = await r.json();
+      if (!r.ok || !j?.ok) throw new Error(j.error || "AI failed");
+      setAiText(j.text || "");
+      // optional: scroll to AI section
+      setTimeout(() => {
+        document.getElementById("ai-itin")?.scrollIntoView({ behavior: "smooth" });
+      }, 0);
+    } catch (e) {
+      setAiErr(e.message || "Failed to polish itinerary");
+    } finally {
+      setAiLoading(false);
+    }
+  }
+
+  // UI
   if (loading) return <div className="results container"><h1>Building…</h1></div>;
   if (err) return <div className="results container"><h1>Oops</h1><p>{err}</p></div>;
   if (!data) return null;
@@ -84,38 +128,27 @@ export default function Results() {
 
   return (
     <div className="results container">
-
-            <div className="sky" aria-hidden="true">
+      {/* background stars/planes you already added */}
+      <div className="sky" aria-hidden="true">
+        <span className="plane" /><span className="plane" /><span className="plane" />
+        <span className="plane" /><span className="plane" /><span className="plane" />
+        <span className="plane" /><span className="plane" /><span className="plane" />
         <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-        <span className="plane" />
-
-      {Array.from({ length: 50 }).map((_, i) => {
-        const size = Math.random() * 4 + 2; // stars between 2px and 6px
-        return (
-          <span
-            key={i}
-            className="star"
-            style={{
+        {Array.from({ length: 50 }).map((_, i) => {
+          const size = Math.random() * 4 + 2;
+          return (
+            <span key={i} className="star" style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
               width: `${size}px`,
               height: `${size}px`,
               animationDelay: `${Math.random() * 3}s`
-            }}
-          />
-        );
-      })}
+            }} />
+          );
+        })}
       </div>
-      
-      <h1>Your Itinerary (raw POIs)</h1>
+
+      <h1>Your Itinerary</h1>
       <p><strong>{data.city}</strong> • {start} → {end} • {pace}</p>
 
       <div className="results-summary card">
@@ -123,6 +156,129 @@ export default function Results() {
         <p><strong>POIs:</strong> {total}</p>
       </div>
 
+      {/* NEW: AI button */}
+      <div className="card" style={{ display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ color:"#cbd5e1" }}>Let AI turn these into a day-by-day plan.</div>
+        <button
+          onClick={runPolish}
+          disabled={aiLoading || total===0}
+          style={{
+            padding:"0.6rem 0.9rem",
+            borderRadius:8,
+            border:"1px solid #10b981",
+            background: aiLoading ? "#0b3b2f" : "#0f172a",
+            color:"#d1fae5",
+            cursor: aiLoading ? "progress" : "pointer",
+            fontWeight:600
+          }}
+        >
+          {aiLoading ? "Polishing…" : "✨ AI polish itinerary"}
+        </button>
+      </div>
+
+{(aiErr || aiText) && (
+  <div id="ai-itin" className="card ai-wrap">
+    
+    {aiErr ? (
+      <p className="ai-error">{aiErr}</p>
+    ) : (
+      (() => {
+        // ------- Parse markdown into: intro + days -------
+        const splitDays = (md = "") => {
+          const lines = md.split("\n");
+          const intro = [];
+          const days = [];
+          let curr = null;
+
+          for (const line of lines) {
+            const t = line.trim();
+            const isDay = (
+              /^\*\*Day\s*\d+.*\*\*$/.test(t) ||            // **Day 1: ...**
+              /^#{1,6}\s*Day\s*\d+.*$/.test(t) ||           // ### Day 1 ...
+              /^Day\s*\d+\s*[:—-]/i.test(t)                 // Day 1: / Day 1 — / Day 1 -
+            ); // **Day 1: ...**
+            if (isDay) {
+              if (curr) days.push(curr);
+              const clean = t.replace(/^\*+|^#{1,6}\s*/g, "").replace(/\*\*/g, "").trim();
+              const [dayHeading, ...rest] = clean.split(/[—:-]/); // split on em-dash, colon, or dash
+              curr = {
+                title: (rest.join(" ").trim()) || "",
+                day: (dayHeading.match(/Day\s*\d+/i) || ["Day ?"])[0],
+                body: [],
+              };
+            } else {
+              if (!curr) intro.push(t);
+              else curr.body.push(t);
+            }
+          }
+          if (curr) days.push(curr);
+          return { intro: intro.join(" ").trim(), days };
+        };
+
+        const { intro, days } = splitDays(aiText);
+
+        const renderBody = (bodyLines = []) => {
+          const out = [];
+          let list = [];
+          const flushList = () => {
+            if (!list.length) return;
+            out.push(
+              <ul key={`ul-${out.length}`} className="ai-ul">
+                {list.map((s, i) => <li key={i}>{s}</li>)}
+              </ul>
+            );
+            list = [];
+          };
+
+          for (const raw of bodyLines) {
+            const l = raw.trim();
+            if (!l) continue;
+            if (/^\*/.test(l)) {
+              // bullet -> strip leading "*" and bold wrappers
+              const text = l.replace(/^\*\s*/, "").replace(/\*\*/g, "").trim();
+              list.push(text);
+            } else {
+              flushList();
+              out.push(
+                <p key={`p-${out.length}`} className="ai-p">
+                  {l.replace(/\*\*/g, "")}
+                </p>
+              );
+            }
+          }
+          flushList();
+          return out;
+        };
+
+        return (
+          <>
+            {intro && (
+              <div className="ai-intro-box">
+                <h2 className="ai-intro-title">✨ AI Itinerary</h2>
+                <p>{intro.replace(/---/g, "").trim()}</p>
+                {/\*\*(.*)\*\*/.test(aiText) && (
+                  <div className="ai-intro-dates">
+                    {aiText.match(/\*\*(.*)\*\*/)[1]}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="ai-grid ai-grid--two">
+              {days.map((d, i) => (
+                <article className="ai-day" key={i}>
+                  <div className="ai-day-badge">{d.day}</div>
+                  {d.title && <h3 className="ai-day-title">{d.title}</h3>}
+                  <div className="ai-day-body">{renderBody(d.body)}</div>
+                </article>
+              ))}
+            </div>
+          </>
+        );
+      })()
+    )}
+  </div>
+)}
       <Pager />
 
       <div className="results-list card">

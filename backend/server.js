@@ -1,10 +1,16 @@
 // backend/server.js
 const express = require("express");
 const cors = require("cors");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 app.use(cors()); 
 app.use(express.json());
+app.use(express.json({ limit: "1mb" }));  
+
+const GEMINI_KEY = "AIzaSyAIrnbvxShddUFOhN-J5Z4Zvc4EIrdG_OU";
+const genAI = new GoogleGenerativeAI(GEMINI_KEY);
+const gemini = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 // ---- put your real key here (backend only) ----
 const OTM_KEY = "5ae2e3f221c38a28845f05b66888648c23a955442a5629972fd705cb";
@@ -77,3 +83,52 @@ app.post("/api/plan", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch itinerary", detail: e.message });
   }
 });
+
+
+// NEW: AI polish endpoint
+app.post("/api/polish", async (req, res) => {
+  try {
+    const { city = "", start = "", end = "", pace = "normal", pois = [] } = req.body || {};
+    if (!pois || pois.length === 0) {
+      return res.status(400).json({ error: "No POIs provided" });
+    }
+
+    // Keep it compact (LLMs don’t need every field)
+    const compact = pois
+      .slice(0, 40) // cap to 40 POIs to keep the prompt light
+      .map(p => `- ${p.name || "Unnamed"} | ${p.kinds || ""} | rate ${p.rate ?? "-"}`)
+      .join("\n");
+
+    const prompt = `
+        You are an expert solo-travel planner. Build a ${pace} itinerary for ${city}
+        for the dates ${start || "(start not given)"} → ${end || "(end not given)"}.
+        Use the POIs below. Prefer central, safe, daytime activities. Group by area to minimize travel.
+        Return clean Markdown with "Day 1", "Day 2", ... and bullets with 1-sentence explanations.
+        Limit yourself to the POIs below. Filter through why a specific POI is important is safe for solo
+        travelers. 
+
+        POIs:
+        ${compact}
+`;
+
+    const result = await gemini.generateContent(prompt);
+    const text = result.response.text();
+    res.json({ ok: true, text });
+  } catch (err) {
+    console.error("Gemini error:", err);
+    res.status(500).json({ error: "Failed to polish itinerary" });
+  }
+});
+
+// Quick Gemini API test
+app.get("/api/gemini-test", async (_req, res) => {
+  try {
+    const result = await gemini.generateContent("Say 'API key works' only.");
+    res.json({ ok: true, text: result.response.text() });
+  } catch (err) {
+    console.error("Gemini test error:", err?.message || err);
+    res.status(500).json({ ok: false, error: err?.message || "Unknown error" });
+  }
+});
+
+

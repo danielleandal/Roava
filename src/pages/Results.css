@@ -2,7 +2,7 @@
 
 /* Container */
 .results.container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 2rem auto;
   padding: 1rem;
   color: #e5e7eb;
@@ -156,4 +156,226 @@
 
 .results-back:hover {
   text-decoration: underline;
+}
+
+/* wrapper */
+.ai-wrap {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 1.2rem;
+}
+
+.ai-title {
+  margin: 0 0 .6rem 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #93c5fd;
+}
+
+.ai-error { color: #f87171; font-weight: 600; }
+.ai-intro  { color:#cbd5e1; margin: .25rem 0 1rem; }
+
+/* responsive grid of day-cards */
+.ai-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .9rem;
+}
+
+/* Force 2 columns on desktop/tablet */
+.ai-grid.ai-grid--two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+/* Collapse to 1 column on small screens */
+@media (max-width: 768px) {
+  .ai-grid.ai-grid--two {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 980px) {
+  .ai-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* day-card */
+.ai-day {
+  position: relative;
+  background: linear-gradient(180deg, #0e1627 0%, #0a1120 100%);
+  border: 1px solid #243246;
+  border-radius: 14px;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+  overflow: hidden;
+}
+
+/* left accent */
+.ai-day::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #60a5fa 0%, #34d399 100%);
+  opacity: .9;
+}
+
+/* badge */
+.ai-day-badge {
+  width: 70px;
+  display: inline-block;
+  background: #0b1a32;
+  border: 1px solid #2b3b52;
+  color: #e5f0ff;
+  font-weight: 800;
+  padding: .25rem .55rem;
+  border-radius: 999px;
+  letter-spacing: .3px;
+  margin-bottom: .35rem;
+}
+
+/* title */
+.ai-day-title {
+  margin: 0 0 .35rem;
+  color: #e2e8f0;
+  font-weight: 750;
+  font-size: 1.05rem;
+}
+
+/* body */
+.ai-day-body { color:#ced7e0; }
+.ai-p { margin: .35rem 0; }
+
+.ai-ul {
+  margin: .35rem 0 .1rem 0;
+  padding-left: 1.05rem;
+}
+.ai-ul li {
+  margin: .22rem 0;
+  line-height: 1.35;
+  list-style: disc;
+}
+
+/* ===== AI Itinerary ===== */
+.ai-wrap {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  padding: 1.1rem 1.2rem 1.25rem;
+  margin-top: 1rem;
+  color: #e5e7eb;
+}
+
+.ai-title {
+  margin: 0 0 .75rem 0;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
+.ai-intro {
+  color: #cbd5e1;
+  margin: .25rem 0 1rem 0;
+  line-height: 1.55;
+}
+
+/* responsive grid of day cards */
+.ai-grid {
+  display: grid;
+  gap: .9rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 720px) {
+  .ai-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 1100px) {
+  .ai-grid { grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.ai-day {
+  background: #0b1220;
+  border: 1px solid #243244;
+  border-radius: 14px;
+  padding: 1.4rem 1.5rem 1.6rem;   /* more internal padding */
+  box-shadow: 0 4px 12px rgba(0,0,0,.22);
+  margin-bottom: 1.2rem;           /* space between stacked rows */
+  min-height: 180px;               /* ensures they don’t look cramped */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.ai-day-badge {
+  display: inline-block;
+  background: #0b2a3a;
+  border: 1px solid #0ea5a5;
+  color: #a7f3d0;
+ 
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: .9rem;
+  margin-bottom: .55rem;
+  margin-bottom: .9rem; 
+}
+
+.ai-day-title {
+  margin: 0 0 .35rem;
+  font-size: 1.05rem;
+  color: #e2e8f0;
+  font-weight: 700;
+  margin-bottom: .7rem;
+}
+
+.ai-day-body { line-height: 1.55; }
+
+.ai-ul {
+  padding-left: 1.1rem; /* keep bullets aligned */
+  margin: .35rem 0 .25rem;
+}
+
+.ai-day-body p,
+.ai-day-body li {
+  margin-bottom: .5rem;   /* more spacing between bullet points/paragraphs */
+}
+
+.ai-ul li {
+  margin: .2rem 0;
+}
+
+.ai-p {
+  margin: .35rem 0;
+  color: #cbd5e1;
+}
+
+/* error text in AI box */
+.ai-error {
+  color: #fca5a5;
+}
+
+.ai-intro-box {
+  background: #0f172a; /* dark navy */
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  color: #e2e8f0; /* light gray */
+  line-height: 1.6;
+}
+
+.ai-intro-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #60a5fa; /* blue highlight */
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-intro-dates {
+  font-weight: 600;
+  color: #a5b4fc; /* soft indigo */
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
 }
