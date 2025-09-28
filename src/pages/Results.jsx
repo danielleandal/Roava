@@ -21,7 +21,11 @@ export default function Results() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiErr, setAiErr] = useState("");
 
-  // pagination state
+  // NEW: AI pagination state
+  const [aiPage, setAiPage] = useState(1);
+  const [aiPerPage, setAiPerPage] = useState(4); // 4 = two rows of two cards
+
+  // pagination state (POIs list)
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(20);
 
@@ -40,7 +44,8 @@ export default function Results() {
         if (!r.ok) throw new Error(j.error || "Failed to fetch");
         setData(j);
         setPage(1);
-        setAiText(""); // reset AI text when city/filters change
+        setAiText("");  // reset AI text when filters change
+        setAiPage(1);   // NEW: reset AI pagination too
       } catch (e) {
         setErr(e.message || "Something went wrong");
       } finally {
@@ -49,7 +54,12 @@ export default function Results() {
     })();
   }, [city, start, end, pace, qs.get("interests")]);
 
-  // pagination calcs
+  // reset to first AI page whenever new AI content arrives
+  useEffect(() => {
+    if (aiText) setAiPage(1);
+  }, [aiText]);
+
+  // pagination calcs (POIs list)
   const total = data?.pois?.length ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / perPage));
 
@@ -63,14 +73,13 @@ export default function Results() {
     if (page > totalPages) setPage(totalPages);
   }, [perPage, totalPages, page]);
 
-  // NEW: call AI polish
+  // call AI polish
   async function runPolish() {
     try {
       setAiLoading(true);
       setAiErr("");
       setAiText("");
 
-      // keep payload light
       const compactPOIs = (data?.pois || [])
         .slice(0, 40)
         .map(p => ({ name: p.name, kinds: p.kinds, rate: p.rate }));
@@ -78,18 +87,11 @@ export default function Results() {
       const r = await fetch("http://45.55.91.156:3001/api/polish", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          city,
-          start,
-          end,
-          pace,
-          pois: compactPOIs
-        })
+        body: JSON.stringify({ city, start, end, pace, pois: compactPOIs })
       });
       const j = await r.json();
       if (!r.ok || !j?.ok) throw new Error(j.error || "AI failed");
       setAiText(j.text || "");
-      // optional: scroll to AI section
       setTimeout(() => {
         document.getElementById("ai-itin")?.scrollIntoView({ behavior: "smooth" });
       }, 0);
@@ -128,7 +130,7 @@ export default function Results() {
 
   return (
     <div className="results container">
-      {/* background stars/planes you already added */}
+      {/* background stars/planes */}
       <div className="sky" aria-hidden="true">
         <span className="plane" /><span className="plane" /><span className="plane" />
         <span className="plane" /><span className="plane" /><span className="plane" />
@@ -156,7 +158,7 @@ export default function Results() {
         <p><strong>POIs:</strong> {total}</p>
       </div>
 
-      {/* NEW: AI button */}
+      {/* AI button */}
       <div className="card" style={{ display:"flex", gap:12, alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ color:"#cbd5e1" }}>Let AI turn these into a day-by-day plan.</div>
         <button
@@ -176,109 +178,134 @@ export default function Results() {
         </button>
       </div>
 
-{(aiErr || aiText) && (
-  <div id="ai-itin" className="card ai-wrap">
-    
-    {aiErr ? (
-      <p className="ai-error">{aiErr}</p>
-    ) : (
-      (() => {
-        // ------- Parse markdown into: intro + days -------
-        const splitDays = (md = "") => {
-          const lines = md.split("\n");
-          const intro = [];
-          const days = [];
-          let curr = null;
+      {(aiErr || aiText) && (
+        <div id="ai-itin" className="card ai-wrap">
+          {aiErr ? (
+            <p className="ai-error">{aiErr}</p>
+          ) : (
+            (() => {
+              // ------- Parse markdown into: intro + days -------
+              const splitDays = (md = "") => {
+                const lines = md.split("\n");
+                const intro = [];
+                const days = [];
+                let curr = null;
 
-          for (const line of lines) {
-            const t = line.trim();
-            const isDay = (
-              /^\*\*Day\s*\d+.*\*\*$/.test(t) ||            // **Day 1: ...**
-              /^#{1,6}\s*Day\s*\d+.*$/.test(t) ||           // ### Day 1 ...
-              /^Day\s*\d+\s*[:—-]/i.test(t)                 // Day 1: / Day 1 — / Day 1 -
-            ); // **Day 1: ...**
-            if (isDay) {
-              if (curr) days.push(curr);
-              const clean = t.replace(/^\*+|^#{1,6}\s*/g, "").replace(/\*\*/g, "").trim();
-              const [dayHeading, ...rest] = clean.split(/[—:-]/); // split on em-dash, colon, or dash
-              curr = {
-                title: (rest.join(" ").trim()) || "",
-                day: (dayHeading.match(/Day\s*\d+/i) || ["Day ?"])[0],
-                body: [],
+                for (const line of lines) {
+                  const t = line.trim();
+                  const isDay =
+                    /^\*\*Day\s*\d+.*\*\*$/.test(t) ||   // **Day 1: ...**
+                    /^#{1,6}\s*Day\s*\d+.*$/.test(t) ||  // ### Day 1 ...
+                    /^Day\s*\d+\s*[:—-]/i.test(t);       // Day 1: / Day 1 — / Day 1 -
+
+                  if (isDay) {
+                    if (curr) days.push(curr);
+                    const clean = t.replace(/^\*+|^#{1,6}\s*/g, "").replace(/\*\*/g, "").trim();
+                    const [dayHeading, ...rest] = clean.split(/[—:-]/);
+                    curr = {
+                      title: (rest.join(" ").trim()) || "",
+                      day: (dayHeading.match(/Day\s*\d+/i) || ["Day ?"])[0],
+                      body: [],
+                    };
+                  } else {
+                    if (!curr) intro.push(t);
+                    else curr.body.push(t);
+                  }
+                }
+                if (curr) days.push(curr);
+                return { intro: intro.join(" ").trim(), days };
               };
-            } else {
-              if (!curr) intro.push(t);
-              else curr.body.push(t);
-            }
-          }
-          if (curr) days.push(curr);
-          return { intro: intro.join(" ").trim(), days };
-        };
 
-        const { intro, days } = splitDays(aiText);
+              const { intro, days } = splitDays(aiText);
 
-        const renderBody = (bodyLines = []) => {
-          const out = [];
-          let list = [];
-          const flushList = () => {
-            if (!list.length) return;
-            out.push(
-              <ul key={`ul-${out.length}`} className="ai-ul">
-                {list.map((s, i) => <li key={i}>{s}</li>)}
-              </ul>
-            );
-            list = [];
-          };
+              // NEW: AI page math
+              const totalDays = days.length;
+              const aiTotalPages = Math.max(1, Math.ceil(totalDays / aiPerPage));
+              const startIdx = (aiPage - 1) * aiPerPage;
+              const pageDays = days.slice(startIdx, startIdx + aiPerPage);
 
-          for (const raw of bodyLines) {
-            const l = raw.trim();
-            if (!l) continue;
-            if (/^\*/.test(l)) {
-              // bullet -> strip leading "*" and bold wrappers
-              const text = l.replace(/^\*\s*/, "").replace(/\*\*/g, "").trim();
-              list.push(text);
-            } else {
-              flushList();
-              out.push(
-                <p key={`p-${out.length}`} className="ai-p">
-                  {l.replace(/\*\*/g, "")}
-                </p>
-              );
-            }
-          }
-          flushList();
-          return out;
-        };
+              const renderBody = (bodyLines = []) => {
+                const out = [];
+                let list = [];
+                const flushList = () => {
+                  if (!list.length) return;
+                  out.push(
+                    <ul key={`ul-${out.length}`} className="ai-ul">
+                      {list.map((s, i) => <li key={i}>{s}</li>)}
+                    </ul>
+                  );
+                  list = [];
+                };
 
-        return (
-          <>
-            {intro && (
-              <div className="ai-intro-box">
-                <h2 className="ai-intro-title">✨ AI Itinerary</h2>
-                <p>{intro.replace(/---/g, "").trim()}</p>
-                {/\*\*(.*)\*\*/.test(aiText) && (
-                  <div className="ai-intro-dates">
-                    {aiText.match(/\*\*(.*)\*\*/)[1]}
+                for (const raw of bodyLines) {
+                  const l = raw.trim();
+                  if (!l) continue;
+                  if (/^\*/.test(l)) {
+                    const text = l.replace(/^\*\s*/, "").replace(/\*\*/g, "").trim();
+                    list.push(text);
+                  } else {
+                    flushList();
+                    out.push(<p key={`p-${out.length}`} className="ai-p">{l.replace(/\*\*/g, "")}</p>);
+                  }
+                }
+                flushList();
+                return out;
+              };
+
+              return (
+                <>
+                {intro && (
+                  <div className="ai-intro-box">
+                    <h2 className="ai-intro-title">✨ AI Itinerary</h2>
+
+                    {/* Show intro description */}
+                    <p>{intro.replace(/---/g, "").trim()}</p>
+
+                    {/* Extract "### Tokyo Solo Traveler Itinerary: ..." */}
+                    {aiText.match(/###\s*(.*?)\n/) && (
+                      <div className="ai-intro-dates">
+                        {aiText.match(/###\s*(.*?)\n/)[1]}
+                      </div>
+                    )}
                   </div>
                 )}
-              </div>
-            )}
 
-            <div className="ai-grid ai-grid--two">
-              {days.map((d, i) => (
-                <article className="ai-day" key={i}>
-                  <div className="ai-day-badge">{d.day}</div>
-                  {d.title && <h3 className="ai-day-title">{d.title}</h3>}
-                  <div className="ai-day-body">{renderBody(d.body)}</div>
-                </article>
-              ))}
-            </div>
-          </>
-        );
-      })()
-    )}
-  </div>
-)}
+                  {/* NEW: AI pager */}
+                  <div className="ai-pager">
+                    <div className="ai-pager-left">
+                      <button onClick={() => setAiPage(1)} disabled={aiPage === 1}>⏮</button>
+                      <button onClick={() => setAiPage(p => Math.max(1, p - 1))} disabled={aiPage === 1}>◀</button>
+                      <span>Page <strong>{aiPage}</strong> / {aiTotalPages}</span>
+                      <button onClick={() => setAiPage(p => Math.min(aiTotalPages, p + 1))} disabled={aiPage === aiTotalPages}>▶</button>
+                      <button onClick={() => setAiPage(aiTotalPages)} disabled={aiPage === aiTotalPages}>⏭</button>
+                    </div>
+                    <div className="ai-pager-right">
+                      <label>Cards per page</label>
+                      <select value={aiPerPage} onChange={e => setAiPerPage(Number(e.target.value))}>
+                        <option value={2}>2</option>
+                        <option value={4}>4</option>
+                        <option value={6}>6</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Day cards (2-column grid) */}
+                  <div className="ai-grid ai-grid--two">
+                    {pageDays.map((d, i) => (
+                      <article className="ai-day" key={`${startIdx + i}`}>
+                        <div className="ai-day-badge">{d.day}</div>
+                        {d.title && <h3 className="ai-day-title">{d.title}</h3>}
+                        <div className="ai-day-body">{renderBody(d.body)}</div>
+                      </article>
+                    ))}
+                  </div>
+                </>
+              );
+            })()
+          )}
+        </div>
+      )}
+
       <Pager />
 
       <div className="results-list card">

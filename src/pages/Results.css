@@ -379,3 +379,42 @@
   margin-top: 0.5rem;
   font-size: 1.5rem;
 }
+
+/* AI pager */
+.ai-pager{
+  margin: 12px 0 8px;
+  padding: 8px 10px;
+  border: 1px solid #1f2937;
+  background: #0b1222;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.ai-pager-left{ display:flex; align-items:center; gap:8px; }
+.ai-pager-right{ display:flex; align-items:center; gap:8px; }
+.ai-pager button{
+  min-width:36px;
+  padding:6px 10px;
+  border:1px solid #334155;
+  background:#0f172a;
+  color:#e5e7eb;
+  border-radius:8px;
+  cursor:pointer;
+}
+.ai-pager button:disabled{ opacity:.5; cursor:not-allowed; }
+.ai-pager select{
+  padding:6px 8px;
+  border-radius:8px;
+  background:#0f172a;
+  color:#e5e7eb;
+  border:1px solid #334155;
+}
+
+/* Ensure the AI grid shows two columns */
+.ai-grid.ai-grid--two{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
